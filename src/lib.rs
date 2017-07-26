@@ -28,13 +28,57 @@ pub struct String<T = Vec<u8>> {
     value: T,
 }
 
-impl<T> String<T>
-    where T: Default,
-{
+impl<T> String<T> {
+    /// Get a reference to the underlying byte storage.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// # use string::*;
+    /// let s = String::new();
+    /// let vec = s.get_ref();
+    /// ```
+    pub fn get_ref(&self) -> &T {
+        &self.value
+    }
+
+    /// Get a mutable reference to the underlying byte storage.
+    ///
+    /// It is inadvisable to directly manipulate the byte storage. This function
+    /// is unsafe as the bytes could no longer be valid UTF-8 after mutation.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// # use string::*;
+    /// let mut s = String::new();
+    ///
+    /// unsafe {
+    ///     let vec = s.get_mut();
+    /// }
+    /// ```
+    pub unsafe fn get_mut(&mut self) -> &mut T {
+        &mut self.value
+    }
+
+    /// Unwraps this `String`, returning the underlying byte storage.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// # use string::*;
+    /// let s = String::new();
+    /// let vec = s.into_inner();
+    /// ```
+    pub fn into_inner(self) -> T {
+        self.value
+    }
+}
+
+impl String {
     /// Creates a new empty `String`.
     ///
-    /// Given that the `String` is empty, this will usually not allocate (the
-    /// details depend on `T`).
+    /// Given that the `String` is empty, this will not allocate.
     ///
     /// # Examples
     ///
