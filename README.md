@@ -2,10 +2,10 @@
 
 A UTF-8 encoded string with configurable byte storage.
 
-[![Crates.io](https://img.shields.io/crates/v/string.svg?maxAge=2592000)](https://crates.io/crates/string)
 [![Build Status](https://travis-ci.org/carllerche/string.svg?branch=master)](https://travis-ci.org/carllerche/string)
-
-[Documentation](https://docs.rs/string)
+[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
+[![Crates.io](https://img.shields.io/crates/v/string.svg?maxAge=2592000)](https://crates.io/crates/string)
+[![Documentation](https://docs.rs/string/badge.svg)](https://docs.rs/string)
 
 ## Usage
 

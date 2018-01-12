@@ -8,5 +8,11 @@ documentation = "https://docs.rs/string"
 homepage = "https://github.com/carllerche/string"
 repository = "https://github.com/carllerche/string"
 readme = "README.md"
+keywords = ["string"]
+categories = ["data-structures"]
+
+[badges.travis-ci]
+repository = "carllerche/string"
+branch = "master"
 
 [dependencies]
