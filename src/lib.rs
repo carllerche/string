@@ -24,6 +24,8 @@ use std::{fmt, ops, str};
 /// This type differs from `std::String` in that it is generic over the
 /// underlying byte storage, enabling it to use `Vec<[u8]>`, `&[u8]`, or third
 /// party types, such as [`Bytes`].
+///
+/// [`Bytes`]: https://docs.rs/bytes/0.4.8/bytes/struct.Bytes.html
 #[derive(Clone, Eq, PartialEq, Ord, PartialOrd, Hash, Default)]
 pub struct String<T = Vec<u8>> {
     value: T,
