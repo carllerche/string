@@ -15,7 +15,7 @@
 //! ```
 
 #![deny(warnings, missing_docs, missing_debug_implementations)]
-#![doc(html_root_url = "https://docs.rs/string/0.1.0")]
+#![doc(html_root_url = "https://docs.rs/string/0.1.1")]
 
 use std::{fmt, ops, str};
 
