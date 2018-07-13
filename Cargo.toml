@@ -1,6 +1,6 @@
 [package]
 name = "string"
-version = "0.1.0" # remember to update html_root_url
+version = "0.1.1" # remember to update html_root_url
 license = "MIT"
 authors = ["Carl Lerche <me@carllerche.com>"]
 description = "A UTF-8 encoded string with configurable byte storage."
