@@ -120,6 +120,16 @@ impl<T> ops::Deref for String<T>
     }
 }
 
+impl<T> ops::DerefMut for String<T>
+    where T: AsRef<[u8]> + AsMut<[u8]>
+{
+    #[inline]
+    fn deref_mut(&mut self) -> &mut str {
+        let b = self.value.as_mut();
+        unsafe { str::from_utf8_unchecked_mut(b) }
+    }
+}
+
 impl From<::std::string::String> for String<::std::string::String> {
     fn from(value: ::std::string::String) -> Self {
         String { value }
@@ -144,6 +154,12 @@ impl<T> TryFrom<T> for String<T>
 }
 
 impl<T: AsRef<[u8]>> fmt::Debug for String<T> {
+    fn fmt(&self, fmt: &mut fmt::Formatter) -> fmt::Result {
+        (**self).fmt(fmt)
+    }
+}
+
+impl<T: AsRef<[u8]>> fmt::Display for String<T> {
     fn fmt(&self, fmt: &mut fmt::Formatter) -> fmt::Result {
         (**self).fmt(fmt)
     }
