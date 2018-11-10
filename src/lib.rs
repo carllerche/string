@@ -76,6 +76,21 @@ impl<T> String<T> {
     pub fn into_inner(self) -> T {
         self.value
     }
+
+    /// Creates a new `String` from a &str.
+    ///
+    /// Use `TryFrom` for conversion from &[u8].
+    ///
+    /// ```
+    /// # use string::*;
+    /// let _: String<Vec<u8>> = String::from_str("nice str");
+    /// ```
+    pub fn from_str<'a>(src: &'a str) -> String<T>
+        where T: From<&'a [u8]>,
+    {
+        let value: T = src.as_bytes().into();
+        Self { value }
+    }
 }
 
 impl String {
@@ -177,5 +192,15 @@ mod test {
     fn test_from_std_string() {
         let s: String<_> = "hello".to_string().into();
         assert_eq!(&s[..], "hello");
+    }
+
+    #[test]
+    fn test_from_str() {
+        let _: String<Vec<u8>> = String::from_str("nice str");
+    }
+
+    #[test]
+    fn test_try_from_bytes() {
+        let _ = String::try_from(b"nice bytes").unwrap();
     }
 }
