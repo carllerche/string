@@ -1,3 +1,6 @@
+#![deny(warnings, missing_docs, missing_debug_implementations)]
+#![doc(html_root_url = "https://docs.rs/string/0.1.2")]
+
 //! A UTF-8 encoded string with configurable byte storage.
 //!
 //! This crate provides `String`, a type similar to its std counterpart, but
@@ -13,9 +16,6 @@
 //! let s: String<[u8; 2]> = String::try_from([b'h', b'i']).unwrap();
 //! assert_eq!(&s[..], "hi");
 //! ```
-
-#![deny(warnings, missing_docs, missing_debug_implementations)]
-#![doc(html_root_url = "https://docs.rs/string/0.1.1")]
 
 use std::{fmt, ops, str};
 
