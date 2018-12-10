@@ -18,6 +18,7 @@
 //! ```
 
 use std::{borrow, fmt, hash, ops, str};
+use std::default::Default;
 
 /// A UTF-8 encoded string with configurable byte storage.
 ///
@@ -25,8 +26,13 @@ use std::{borrow, fmt, hash, ops, str};
 /// underlying byte storage, enabling it to use `Vec<[u8]>`, `&[u8]`, or third
 /// party types, such as [`Bytes`].
 ///
+/// In order to construct `String` via any of the non-unsafe constructors,
+/// the backing storage needs to implement the `StableAsRef` marker trait.
+/// If you wish to construct `String` with a type that does not implement `StableAsRef`,
+/// you can use the `from_utf8_unchecked` constructor.
+///
 /// [`Bytes`]: https://docs.rs/bytes/0.4.8/bytes/struct.Bytes.html
-#[derive(Clone, Eq, PartialEq, Ord, PartialOrd, Default)]
+#[derive(Clone, Eq, PartialEq, Ord, PartialOrd)]
 pub struct String<T = Vec<u8>> {
     value: T,
 }
@@ -86,7 +92,7 @@ impl<T> String<T> {
     /// let _: String<Vec<u8>> = String::from_str("nice str");
     /// ```
     pub fn from_str<'a>(src: &'a str) -> String<T>
-        where T: From<&'a [u8]>,
+        where T: From<&'a [u8]> + StableAsRef,
     {
         let value: T = src.as_bytes().into();
         Self { value }
@@ -118,6 +124,15 @@ impl<T> String<T>
     /// given value is valid UTF-8.
     ///
     /// Use `TryFrom` for a safe conversion.
+    ///
+    /// # Safety
+    ///
+    /// You must ensure that:
+    ///
+    /// 1. The backing storage type `T` adheres to the contract as documented on the `StableAsRef`
+    ///    marker trait.
+    /// 2. If `T` implements `AsRef<[u8]>` and/or `AsMut<[u8]>`, the byte slice returned
+    ///    by calling `as_ref` and/or `as_mut` on the provided value represents valid utf-8.
     pub unsafe fn from_utf8_unchecked(value: T) -> String<T> {
         String { value }
     }
@@ -147,6 +162,8 @@ impl<T> ops::Deref for String<T>
     #[inline]
     fn deref(&self) -> &str {
         let b = self.value.as_ref();
+        // SAFETY: The `StableAsRef` marker trait ensures that
+        //         the impl of `AsRef<[u8]>` for `T` behaves sanely.
         unsafe { str::from_utf8_unchecked(b) }
     }
 }
@@ -157,6 +174,8 @@ impl<T> ops::DerefMut for String<T>
     #[inline]
     fn deref_mut(&mut self) -> &mut str {
         let b = self.value.as_mut();
+        // SAFETY: The `StableAsRef` marker trait ensures that
+        //         the impl of `AsMut<[u8]>` for `T` behaves sanely.
         unsafe { str::from_utf8_unchecked_mut(b) }
     }
 }
@@ -175,14 +194,16 @@ impl From<::std::string::String> for String<::std::string::String> {
     }
 }
 
-impl<'a> From<&'a str> for String<&'a str> {
-    fn from(value: &'a str) -> Self {
-        String { value }
+impl<T> Default for String<T>
+    where T: Default + StableAsRef
+{
+    fn default() -> Self {
+        String { value: T::default() }
     }
 }
 
 impl<T> TryFrom<T> for String<T>
-    where T: AsRef<[u8]>
+    where T: AsRef<[u8]> + StableAsRef
 {
     type Error = str::Utf8Error;
 
@@ -223,6 +244,50 @@ mod sealed {
     /// downstream crates.
     pub trait Sealed {}
 }
+
+/// Marker trait that indicates that a type is guaranteed safe to use as backing storage
+/// for `String`.
+///
+/// In order to be safe, a storage type `T` needs to guarantee the following:
+///
+/// - If `T` implements `AsRef<[u8]>` and/or `AsMut<[u8]>`, the contents of `T` as visible
+///   the byte slice returned by `as_ref` and `as_mut` may only be mutated through mutable
+///   references or owned access. In other words, no use of interior mutability.
+///
+/// - If `T` implements `AsRef<[u8]>`, the `as_ref` method must always return the same
+///   slice of bytes (unless the storage is mutated).
+///
+/// - If `T` implements `AsRef<[u8]>` and `AsMut<[u8]>`, the `as_mut` method must return
+///   a mutable reference to the same slice of bytes as the `as_ref` method returns.
+///
+/// - If `T` implements `AsRef<[u8]>` and `Default`, the default value must represent the
+///   empty byte sequence. In other words, `T::default().as_ref().len() == 0`.
+///
+/// - If `T` implements `AsRef<[u8]>` and `From<&[u8]>`, it must do so in such a way that
+///   the byte slice returned by `as_ref` is equal to the byte slice provided to the `from`
+///   method.
+pub unsafe trait StableAsRef {}
+
+unsafe impl<'a, T> StableAsRef for &'a T where T: StableAsRef {}
+unsafe impl<'a, T> StableAsRef for &'a mut T where T: StableAsRef {}
+unsafe impl<T> StableAsRef for Box<T> where T: StableAsRef {}
+unsafe impl<T> StableAsRef for std::rc::Rc<T> where T: StableAsRef {}
+unsafe impl<T> StableAsRef for std::sync::Arc<T> where T: StableAsRef {}
+
+unsafe impl StableAsRef for std::string::String {}
+unsafe impl StableAsRef for str {}
+unsafe impl StableAsRef for Vec<u8> {}
+unsafe impl StableAsRef for [u8] {}
+
+macro_rules! array_impls {
+    ($($len:expr)+) => {
+        $(
+            unsafe impl StableAsRef for [u8; $len] {}
+        )+
+    }
+}
+
+array_impls!(0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16);
 
 #[cfg(test)]
 mod test {
