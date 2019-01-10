@@ -17,7 +17,7 @@
 //! assert_eq!(&s[..], "hi");
 //! ```
 
-use std::{fmt, ops, str};
+use std::{borrow, fmt, ops, str};
 
 /// A UTF-8 encoded string with configurable byte storage.
 ///
@@ -142,6 +142,14 @@ impl<T> ops::DerefMut for String<T>
     fn deref_mut(&mut self) -> &mut str {
         let b = self.value.as_mut();
         unsafe { str::from_utf8_unchecked_mut(b) }
+    }
+}
+
+impl<T> borrow::Borrow<str> for String<T>
+    where T: AsRef<[u8]>
+{
+    fn borrow(&self) -> &str {
+        &*self
     }
 }
 
