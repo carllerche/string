@@ -1,3 +1,7 @@
+# 0.1.3 (...)
+
+* Implement `Borrow`.
+
 # 0.1.2 (November 21, 2018)
 
 * Implement `DerefMut` and `Display` (#5).
