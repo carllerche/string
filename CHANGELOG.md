@@ -1,6 +1,7 @@
 # 0.1.3 (...)
 
 * Implement `Borrow`.
+* Implement `PartialEq<str>`.
 
 # 0.1.2 (November 21, 2018)
 
