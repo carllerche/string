@@ -17,7 +17,7 @@
 //! assert_eq!(&s[..], "hi");
 //! ```
 
-use std::{borrow, fmt, ops, str};
+use std::{borrow, fmt, hash, ops, str};
 
 /// A UTF-8 encoded string with configurable byte storage.
 ///
@@ -26,7 +26,7 @@ use std::{borrow, fmt, ops, str};
 /// party types, such as [`Bytes`].
 ///
 /// [`Bytes`]: https://docs.rs/bytes/0.4.8/bytes/struct.Bytes.html
-#[derive(Clone, Eq, PartialEq, Ord, PartialOrd, Hash, Default)]
+#[derive(Clone, Eq, PartialEq, Ord, PartialOrd, Default)]
 pub struct String<T = Vec<u8>> {
     value: T,
 }
@@ -120,6 +120,22 @@ impl<T> String<T>
     /// Use `TryFrom` for a safe conversion.
     pub unsafe fn from_utf8_unchecked(value: T) -> String<T> {
         String { value }
+    }
+}
+
+impl<T> PartialEq<str> for String<T>
+    where T: AsRef<[u8]>
+{
+    fn eq(&self, other: &str) -> bool {
+        &*self == other
+    }
+}
+
+impl<T> hash::Hash for String<T>
+    where T: AsRef<[u8]>
+{
+    fn hash<H: hash::Hasher>(&self, state: &mut H) {
+        ops::Deref::deref(self).hash(state);
     }
 }
 
