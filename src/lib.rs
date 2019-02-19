@@ -17,6 +17,9 @@
 //! assert_eq!(&s[..], "hi");
 //! ```
 
+#[cfg(feature = "bytes")]
+extern crate bytes;
+
 use std::{borrow, fmt, hash, ops, str};
 use std::default::Default;
 
@@ -278,6 +281,12 @@ unsafe impl StableAsRef for std::string::String {}
 unsafe impl StableAsRef for str {}
 unsafe impl StableAsRef for Vec<u8> {}
 unsafe impl StableAsRef for [u8] {}
+
+#[cfg(feature = "bytes")]
+unsafe impl StableAsRef for bytes::Bytes {}
+
+#[cfg(feature = "bytes")]
+unsafe impl StableAsRef for bytes::BytesMut {}
 
 macro_rules! array_impls {
     ($($len:expr)+) => {
