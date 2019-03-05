@@ -17,8 +17,12 @@ readme = "README.md"
 keywords = ["string"]
 categories = ["data-structures"]
 
+[features]
+default = ["bytes"]
+
 [badges.travis-ci]
 repository = "carllerche/string"
 branch = "master"
 
 [dependencies]
+bytes = { version = "0.4", optional = true }
