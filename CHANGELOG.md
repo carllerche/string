@@ -1,3 +1,8 @@
+# 0.2.0 (March 6, 2019)
+
+### Changed
+- Require byte store to implement `StableAsRef` (#10).
+
 # 0.1.3 (January 10, 2019)
 
 * Implement `Borrow`.
