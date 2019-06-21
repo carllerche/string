@@ -145,7 +145,7 @@ impl<T> PartialEq<str> for String<T>
     where T: AsRef<[u8]>
 {
     fn eq(&self, other: &str) -> bool {
-        &*self == other
+        &self[..] == other
     }
 }
 
@@ -305,7 +305,7 @@ mod test {
     #[test]
     fn test_from_std_string() {
         let s: String<_> = "hello".to_string().into();
-        assert_eq!(&s[..], "hello");
+        assert_eq!(&s, "hello");
     }
 
     #[test]
