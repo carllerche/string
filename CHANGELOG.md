@@ -1,3 +1,8 @@
+# 0.2.1 (June 27, 2019)
+
+### Fixed
+- Stack overflow on `PartialEq` (#15).
+
 # 0.2.0 (March 6, 2019)
 
 ### Changed
