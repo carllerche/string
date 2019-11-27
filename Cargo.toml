@@ -16,6 +16,7 @@ repository = "https://github.com/carllerche/string"
 readme = "README.md"
 keywords = ["string"]
 categories = ["data-structures"]
+edition = "2018"
 
 [features]
 default = ["bytes"]
@@ -25,4 +26,4 @@ repository = "carllerche/string"
 branch = "master"
 
 [dependencies]
-bytes = { version = "0.4", optional = true }
+bytes = { version = "0.5", optional = true }
