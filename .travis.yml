@@ -9,16 +9,12 @@ rust:
 os:
   - linux
 
-matrix:
-  include:
-    - os: linux
-
 script:
   - cargo build --no-default-features
   - cargo test --no-default-features
   - if [ "${TRAVIS_RUST_VERSION}" != "1.20.0" ]; then
-      cargo build
-      cargo test
+      cargo build;
+      cargo test;
     fi
 
 notifications:
