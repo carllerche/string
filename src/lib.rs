@@ -17,11 +17,7 @@
 //! assert_eq!(&s[..], "hi");
 //! ```
 
-#[cfg(feature = "bytes")]
-extern crate bytes;
-
-use std::default::Default;
-use std::{borrow, fmt, hash, ops, str};
+use std::{borrow, default::Default, fmt, hash, ops, str};
 
 /// A UTF-8 encoded string with configurable byte storage.
 ///
