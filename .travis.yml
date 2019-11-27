@@ -18,6 +18,8 @@ script:
   - cargo test --no-default-features
   - cargo build
   - cargo test
+  - cargo fmt -- --check
+  - cargo clippy
 
 notifications:
   email:

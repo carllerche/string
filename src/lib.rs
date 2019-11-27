@@ -1,4 +1,4 @@
-#![deny(warnings, missing_docs, missing_debug_implementations)]
+#![deny(warnings, missing_docs, missing_debug_implementations, clippy::all)]
 #![doc(html_root_url = "https://docs.rs/string/0.2.1")]
 
 //! A UTF-8 encoded string with configurable byte storage.
@@ -20,8 +20,8 @@
 #[cfg(feature = "bytes")]
 extern crate bytes;
 
-use std::{borrow, fmt, hash, ops, str};
 use std::default::Default;
+use std::{borrow, fmt, hash, ops, str};
 
 /// A UTF-8 encoded string with configurable byte storage.
 ///
@@ -55,6 +55,8 @@ impl<T> String<T> {
     }
 
     /// Get a mutable reference to the underlying byte storage.
+    ///
+    /// # Safety
     ///
     /// It is inadvisable to directly manipulate the byte storage. This function
     /// is unsafe as the bytes could no longer be valid UTF-8 after mutation.
@@ -94,8 +96,10 @@ impl<T> String<T> {
     /// # use string::*;
     /// let _: String<Vec<u8>> = String::from_str("nice str");
     /// ```
+    #[allow(clippy::should_implement_trait)]
     pub fn from_str<'a>(src: &'a str) -> String<T>
-        where T: From<&'a [u8]> + StableAsRef,
+    where
+        T: From<&'a [u8]> + StableAsRef,
     {
         let value: T = src.as_bytes().into();
         Self { value }
@@ -121,7 +125,8 @@ impl String {
 }
 
 impl<T> String<T>
-    where T: AsRef<[u8]>,
+where
+    T: AsRef<[u8]>,
 {
     /// Converts the provided value to a `String` without checking that the
     /// given value is valid UTF-8.
@@ -142,15 +147,18 @@ impl<T> String<T>
 }
 
 impl<T> PartialEq<str> for String<T>
-    where T: AsRef<[u8]>
+where
+    T: AsRef<[u8]>,
 {
     fn eq(&self, other: &str) -> bool {
         &self[..] == other
     }
 }
 
+#[allow(clippy::derive_hash_xor_eq)]
 impl<T> hash::Hash for String<T>
-    where T: AsRef<[u8]>
+where
+    T: AsRef<[u8]>,
 {
     fn hash<H: hash::Hasher>(&self, state: &mut H) {
         ops::Deref::deref(self).hash(state);
@@ -158,7 +166,8 @@ impl<T> hash::Hash for String<T>
 }
 
 impl<T> ops::Deref for String<T>
-    where T: AsRef<[u8]>
+where
+    T: AsRef<[u8]>,
 {
     type Target = str;
 
@@ -172,7 +181,8 @@ impl<T> ops::Deref for String<T>
 }
 
 impl<T> ops::DerefMut for String<T>
-    where T: AsRef<[u8]> + AsMut<[u8]>
+where
+    T: AsRef<[u8]> + AsMut<[u8]>,
 {
     #[inline]
     fn deref_mut(&mut self) -> &mut str {
@@ -184,7 +194,8 @@ impl<T> ops::DerefMut for String<T>
 }
 
 impl<T> borrow::Borrow<str> for String<T>
-    where T: AsRef<[u8]>
+where
+    T: AsRef<[u8]>,
 {
     fn borrow(&self) -> &str {
         &*self
@@ -198,15 +209,19 @@ impl From<::std::string::String> for String<::std::string::String> {
 }
 
 impl<T> Default for String<T>
-    where T: Default + StableAsRef
+where
+    T: Default + StableAsRef,
 {
     fn default() -> Self {
-        String { value: T::default() }
+        String {
+            value: T::default(),
+        }
     }
 }
 
 impl<T> TryFrom<T> for String<T>
-    where T: AsRef<[u8]> + StableAsRef
+where
+    T: AsRef<[u8]> + StableAsRef,
 {
     type Error = str::Utf8Error;
 
