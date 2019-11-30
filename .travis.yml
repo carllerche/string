@@ -18,7 +18,9 @@ script:
   - cargo test --no-default-features
   - cargo build
   - cargo test
+  - rustup component add fmt
   - cargo fmt -- --check
+  - rustup component add clippy
   - cargo clippy
 
 notifications:
