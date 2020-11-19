@@ -14,12 +14,13 @@ documentation = "https://docs.rs/string/0.2.1/string/"
 homepage = "https://github.com/carllerche/string"
 repository = "https://github.com/carllerche/string"
 readme = "README.md"
-keywords = ["string"]
+keywords = ["string", "no-std"]
 categories = ["data-structures"]
 edition = "2018"
 
 [features]
-default = ["bytes"]
+default = ["alloc", "bytes"]
+alloc = []
 
 [badges.travis-ci]
 repository = "carllerche/string"

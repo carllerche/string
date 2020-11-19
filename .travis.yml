@@ -14,8 +14,8 @@ matrix:
       rust: 1.39.0
 
 script:
-  - cargo build --no-default-features
-  - cargo test --no-default-features
+  - cargo build --no-default-features --features=alloc
+  - cargo test --no-default-features --features=alloc
   - cargo build
   - cargo test
   - rustup component add rustfmt
