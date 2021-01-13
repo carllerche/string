@@ -1,5 +1,6 @@
 #![deny(warnings, missing_docs, missing_debug_implementations, clippy::all)]
 #![doc(html_root_url = "https://docs.rs/string/0.2.1")]
+#![no_std]
 
 //! A UTF-8 encoded string with configurable byte storage.
 //!
@@ -17,23 +18,51 @@
 //! assert_eq!(&s[..], "hi");
 //! ```
 
-use std::{borrow, default::Default, fmt, hash, ops, str};
+#[cfg(feature = "alloc")]
+extern crate alloc;
 
-/// A UTF-8 encoded string with configurable byte storage.
-///
-/// This type differs from `std::String` in that it is generic over the
-/// underlying byte storage, enabling it to use `Vec<[u8]>`, `&[u8]`, or third
-/// party types, such as [`Bytes`].
-///
-/// In order to construct `String` via any of the non-unsafe constructors,
-/// the backing storage needs to implement the `StableAsRef` marker trait.
-/// If you wish to construct `String` with a type that does not implement `StableAsRef`,
-/// you can use the `from_utf8_unchecked` constructor.
-///
-/// [`Bytes`]: https://docs.rs/bytes/0.4.8/bytes/struct.Bytes.html
-#[derive(Clone, Eq, PartialEq, Ord, PartialOrd)]
-pub struct String<T = Vec<u8>> {
-    value: T,
+#[cfg(feature = "alloc")]
+use alloc::{boxed::Box, vec::Vec};
+use core::{borrow, default::Default, fmt, hash, ops, str};
+
+macro_rules! default_param_if_alloc {
+    (
+        $(#[$attr:meta])*
+        pub struct $name:ident<$($param:ident = $default:ty),*> {
+            $($field:ident: $ty:ty),*$(,)?
+        }
+    ) => {
+        $(#[$attr])*
+        #[cfg(feature = "alloc")]
+        pub struct $name<$($param = $default),*> {
+            $($field: $ty,)*
+        }
+
+        $(#[$attr])*
+        #[cfg(not(feature = "alloc"))]
+        pub struct $name<$($param),*> {
+            $($field: $ty,)*
+        }
+    };
+}
+
+default_param_if_alloc! {
+    /// A UTF-8 encoded string with configurable byte storage.
+    ///
+    /// This type differs from `std::String` in that it is generic over the
+    /// underlying byte storage, enabling it to use `Vec<[u8]>`, `&[u8]`, or third
+    /// party types, such as [`Bytes`].
+    ///
+    /// In order to construct `String` via any of the non-unsafe constructors,
+    /// the backing storage needs to implement the `StableAsRef` marker trait.
+    /// If you wish to construct `String` with a type that does not implement `StableAsRef`,
+    /// you can use the `from_utf8_unchecked` constructor.
+    ///
+    /// [`Bytes`]: https://docs.rs/bytes/0.4.8/bytes/struct.Bytes.html
+    #[derive(Clone, Eq, PartialEq, Ord, PartialOrd)]
+    pub struct String<T = Vec<u8>> {
+        value: T,
+    }
 }
 
 impl<T> String<T> {
@@ -102,6 +131,7 @@ impl<T> String<T> {
     }
 }
 
+#[cfg(feature = "alloc")]
 impl String {
     /// Creates a new empty `String`.
     ///
@@ -198,8 +228,9 @@ where
     }
 }
 
-impl From<::std::string::String> for String<::std::string::String> {
-    fn from(value: ::std::string::String) -> Self {
+#[cfg(feature = "alloc")]
+impl From<alloc::string::String> for String<alloc::string::String> {
+    fn from(value: alloc::string::String) -> Self {
         String { value }
     }
 }
@@ -284,12 +315,17 @@ pub unsafe trait StableAsRef {}
 
 unsafe impl<'a, T> StableAsRef for &'a T where T: StableAsRef {}
 unsafe impl<'a, T> StableAsRef for &'a mut T where T: StableAsRef {}
+#[cfg(feature = "alloc")]
 unsafe impl<T> StableAsRef for Box<T> where T: StableAsRef {}
-unsafe impl<T> StableAsRef for std::rc::Rc<T> where T: StableAsRef {}
-unsafe impl<T> StableAsRef for std::sync::Arc<T> where T: StableAsRef {}
+#[cfg(feature = "alloc")]
+unsafe impl<T> StableAsRef for alloc::rc::Rc<T> where T: StableAsRef {}
+#[cfg(feature = "alloc")]
+unsafe impl<T> StableAsRef for alloc::sync::Arc<T> where T: StableAsRef {}
 
-unsafe impl StableAsRef for std::string::String {}
+#[cfg(feature = "alloc")]
+unsafe impl StableAsRef for alloc::string::String {}
 unsafe impl StableAsRef for str {}
+#[cfg(feature = "alloc")]
 unsafe impl StableAsRef for Vec<u8> {}
 unsafe impl StableAsRef for [u8] {}
 
@@ -311,19 +347,26 @@ array_impls!(0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16);
 
 #[cfg(test)]
 mod test {
+    #[cfg(feature = "alloc")]
+    use alloc::string::ToString;
+
+    #[allow(unused_imports)]
     use super::*;
 
+    #[cfg(feature = "alloc")]
     #[test]
     fn test_from_std_string() {
         let s: String<_> = "hello".to_string().into();
         assert_eq!(&s, "hello");
     }
 
+    #[cfg(feature = "alloc")]
     #[test]
     fn test_from_str() {
         let _: String<Vec<u8>> = String::from_str("nice str");
     }
 
+    #[cfg(feature = "alloc")]
     #[test]
     fn test_try_from_bytes() {
         let _ = String::try_from(b"nice bytes").unwrap();
