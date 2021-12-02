@@ -5,12 +5,12 @@ name = "string"
 # - Update CHANGELOG.md.
 # - Update README.md.
 # - Update doc URL.
-# - Create "v0.1.x" git tag.
-version = "0.2.1"
+# - Create "v0.3.x" git tag.
+version = "0.3.0"
 license = "MIT"
 authors = ["Carl Lerche <me@carllerche.com>"]
 description = "A UTF-8 encoded string with configurable byte storage."
-documentation = "https://docs.rs/string/0.2.1/string/"
+documentation = "https://docs.rs/string/0.3.0/string/"
 homepage = "https://github.com/carllerche/string"
 repository = "https://github.com/carllerche/string"
 readme = "README.md"

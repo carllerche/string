@@ -1,3 +1,8 @@
+# 0.3.0 (December 2, 2021)
+
+### Changed
+- Depend on `bytes` 1.0 (#27)
+
 # 0.2.1 (June 27, 2019)
 
 ### Fixed
