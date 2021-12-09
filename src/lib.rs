@@ -292,22 +292,13 @@ unsafe impl StableAsRef for std::string::String {}
 unsafe impl StableAsRef for str {}
 unsafe impl StableAsRef for Vec<u8> {}
 unsafe impl StableAsRef for [u8] {}
+unsafe impl<const N: usize> StableAsRef for [u8; N] {}
 
 #[cfg(feature = "bytes")]
 unsafe impl StableAsRef for bytes::Bytes {}
 
 #[cfg(feature = "bytes")]
 unsafe impl StableAsRef for bytes::BytesMut {}
-
-macro_rules! array_impls {
-    ($($len:expr)+) => {
-        $(
-            unsafe impl StableAsRef for [u8; $len] {}
-        )+
-    }
-}
-
-array_impls!(0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16);
 
 #[cfg(test)]
 mod test {
