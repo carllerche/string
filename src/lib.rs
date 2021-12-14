@@ -189,6 +189,15 @@ where
     }
 }
 
+impl<T> AsRef<str> for String<T>
+where
+    T: AsRef<[u8]>,
+{
+    fn as_ref(&self) -> &str {
+        self
+    }
+}
+
 impl<T> borrow::Borrow<str> for String<T>
 where
     T: AsRef<[u8]>,
