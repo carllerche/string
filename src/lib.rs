@@ -204,6 +204,17 @@ impl From<::std::string::String> for String<::std::string::String> {
     }
 }
 
+#[cfg(feature = "bytes")]
+impl From<::std::string::String> for String<bytes::Bytes> {
+    fn from(value: ::std::string::String) -> Self {
+        let into_bytes = bytes::Bytes::from(value);
+
+        // Safety: We just extracted the bytes from a `std::string::String`, so they must be
+        // valid UTF-8.
+        unsafe { Self::from_utf8_unchecked(into_bytes) }
+    }
+}
+
 impl<T> Default for String<T>
 where
     T: Default + StableAsRef,
@@ -315,7 +326,14 @@ mod test {
 
     #[test]
     fn test_from_std_string() {
-        let s: String<_> = "hello".to_string().into();
+        let s: String<::std::string::String> = "hello".to_string().into();
+        assert_eq!(&s, "hello");
+    }
+
+    #[cfg(feature = "bytes")]
+    #[test]
+    fn test_from_std_string_to_bytes() {
+        let s: String<bytes::Bytes> = "hello".to_string().into();
         assert_eq!(&s, "hello");
     }
 
