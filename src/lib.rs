@@ -18,6 +18,7 @@
 //! ```
 
 use std::{borrow, default::Default, fmt, hash, ops, str};
+use std::iter::{FromIterator, IntoIterator};
 
 /// A UTF-8 encoded string with configurable byte storage.
 ///
@@ -91,14 +92,19 @@ impl<T> String<T> {
     /// ```
     /// # use string::*;
     /// let _: String<Vec<u8>> = String::from_str("nice str");
+    ///
+    /// let _: String<bytes::Bytes> = String::from_str("nice str");
+    ///
+    /// let s = std::string::String::from("nice str");
+    /// // from a non-static &str
+    /// let _: String<bytes::Bytes> = String::from_str(s.as_str());
     /// ```
     #[allow(clippy::should_implement_trait)]
-    pub fn from_str<'a>(src: &'a str) -> String<T>
+    pub fn from_str(src: &str) -> String<T>
     where
-        T: From<&'a [u8]> + StableAsRef,
+        T: FromIterator<u8> + StableAsRef,
     {
-        let value: T = src.as_bytes().into();
-        Self { value }
+        Self::from_iter(src.bytes())
     }
 }
 
@@ -201,6 +207,17 @@ where
 impl From<::std::string::String> for String<::std::string::String> {
     fn from(value: ::std::string::String) -> Self {
         String { value }
+    }
+}
+
+impl<T> FromIterator<u8> for String<T>
+where
+    T: FromIterator<u8> + StableAsRef,
+{
+    fn from_iter<I: IntoIterator<Item = u8>>(iter: I) -> Self {
+        Self {
+            value: T::from_iter(iter),
+        }
     }
 }
 
