@@ -1,5 +1,5 @@
 #![deny(warnings, missing_docs, missing_debug_implementations, clippy::all)]
-#![doc(html_root_url = "https://docs.rs/string/0.3.0")]
+#![doc(html_root_url = "https://docs.rs/string/0.3.1")]
 
 //! A UTF-8 encoded string with configurable byte storage.
 //!

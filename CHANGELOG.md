@@ -1,3 +1,8 @@
+# 0.3.1 (September 13, 2024)
+
+### Added
+- implement `inspect`
+
 # 0.3.0 (December 2, 2021)
 
 ### Changed
