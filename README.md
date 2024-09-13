@@ -13,7 +13,7 @@ To use `string`, first add this to your `Cargo.toml`:
 
 ```toml
 [dependencies]
-string = "0.3.0"
+string = "0.3.1"
 ```
 
 Next, add this to your crate:

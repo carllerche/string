@@ -1,5 +1,5 @@
 #![deny(warnings, missing_docs, missing_debug_implementations, clippy::all)]
-#![doc(html_root_url = "https://docs.rs/string/0.3.0")]
+#![doc(html_root_url = "https://docs.rs/string/0.3.1")]
 
 //! A UTF-8 encoded string with configurable byte storage.
 //!
@@ -236,6 +236,20 @@ impl<T: AsRef<[u8]>> fmt::Debug for String<T> {
 impl<T: AsRef<[u8]>> fmt::Display for String<T> {
     fn fmt(&self, fmt: &mut fmt::Formatter) -> fmt::Result {
         (**self).fmt(fmt)
+    }
+}
+
+#[cfg(feature = "valuable")]
+impl<T> inspect::Valuable for String<T>
+where
+    T: AsRef<[u8]>,
+{
+    fn as_value(&self) -> inspect::Value<'_> {
+        inspect::Value::String(&self[..])
+    }
+
+    fn visit(&self, visit: &mut dyn inspect::Visit) {
+        visit.visit_value(inspect::Value::String(self));
     }
 }
 
