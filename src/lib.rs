@@ -239,6 +239,20 @@ impl<T: AsRef<[u8]>> fmt::Display for String<T> {
     }
 }
 
+#[cfg(feature = "valuable")]
+impl<T> inspect::Valuable for String<T>
+where
+    T: AsRef<[u8]>,
+{
+    fn as_value(&self) -> inspect::Value<'_> {
+        inspect::Value::String(&self[..])
+    }
+
+    fn visit(&self, visit: &mut dyn inspect::Visit) {
+        visit.visit_value(inspect::Value::String(self));
+    }
+}
+
 /// Attempt to construct `Self` via a conversion.
 ///
 /// This trait will be deprecated in favor of [std::convert::TryFrom] once it

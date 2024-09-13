@@ -20,6 +20,7 @@ edition = "2018"
 
 [features]
 default = ["bytes"]
+valuable = ["inspect"]
 
 [badges.travis-ci]
 repository = "carllerche/string"
@@ -27,3 +28,4 @@ branch = "master"
 
 [dependencies]
 bytes = { version = "1", optional = true }
+inspect = { version = "0.1", optional = true }
