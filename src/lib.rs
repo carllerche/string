@@ -151,6 +151,55 @@ where
     }
 }
 
+#[cfg(feature = "bytes")]
+impl String<bytes::Bytes> {
+    /// Returns a slice of self that is equivalent to the given `substr`.
+    ///
+    /// This is like [`Bytes::slice_ref`][bytes::Bytes::slice_ref], but for string slices. It is
+    /// only available when `T` is [`Bytes`][bytes::Bytes].
+    ///
+    /// When processing a string with other tools, such as parsers or [regex] captures, one often
+    /// gets a `&str` which is in fact a slice of the `String<Bytes>`, i.e. a substring of it. This
+    /// function turns that `&str` into another `String<Bytes>`.
+    ///
+    /// This operation, like [`from_utf8_unchecked`] and unlike [`from_str`], is `O(1)`. Unlike
+    /// `from_utf8_unchecked`, this function is safe.
+    ///
+    /// # Examples
+    ///
+    /// ```rust
+    /// use bytes::Bytes;
+    /// use string::String;
+    ///
+    /// let string = String::<Bytes>::from_str("012345678");
+    /// let slice = &string[2..6];
+    /// let substring: String<Bytes> = string.slice_ref(slice);
+    ///
+    /// // `substring` is not a copy, but an additional reference to the same bytes in memory as
+    /// // `string`.
+    /// assert_eq!(substring.as_ptr(), slice.as_ptr());
+    ///
+    /// // Despite pointing to the same memory, `substring` can outlive `string`.
+    /// drop(string);
+    /// assert_eq!(&*substring, "2345");
+    /// ```
+    ///
+    /// # Panics
+    ///
+    /// Requires that the given `substr` is in fact contained within the `String` buffer; otherwise
+    /// this function will panic.
+    ///
+    /// [`from_str`]: Self::from_str
+    /// [`from_utf8_unchecked`]: Self::from_utf8_unchecked
+    /// [regex]: https://docs.rs/regex/
+    pub fn slice_ref(&self, substr: &str) -> Self {
+        let byte_slice = self.value.slice_ref(substr.as_bytes());
+
+        // Safety: The result of `slice_ref` points to the same bytes, so if `substr` is a valid string slice, then the result of `slice_ref` will be too.
+        unsafe { Self::from_utf8_unchecked(byte_slice) }
+    }
+}
+
 #[allow(clippy::derive_hash_xor_eq)]
 impl<T> hash::Hash for String<T>
 where
