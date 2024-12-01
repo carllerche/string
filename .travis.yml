@@ -11,7 +11,7 @@ os:
 matrix:
   include:
     - os: linux
-      rust: 1.39.0
+      rust: 1.51.0
 
 script:
   - cargo build --no-default-features
