@@ -17,7 +17,7 @@
 //! assert_eq!(&s[..], "hi");
 //! ```
 
-use std::{borrow, default::Default, fmt, hash, ops, str};
+use std::{borrow, cmp, default::Default, fmt, hash, ops, str};
 
 /// A UTF-8 encoded string with configurable byte storage.
 ///
@@ -31,7 +31,7 @@ use std::{borrow, default::Default, fmt, hash, ops, str};
 /// you can use the `from_utf8_unchecked` constructor.
 ///
 /// [`Bytes`]: https://docs.rs/bytes/0.4.8/bytes/struct.Bytes.html
-#[derive(Clone, Eq, PartialEq, Ord, PartialOrd)]
+#[derive(Clone)]
 pub struct String<T = Vec<u8>> {
     value: T,
 }
@@ -142,6 +142,17 @@ where
     }
 }
 
+impl<T> PartialEq for String<T>
+where
+    T: AsRef<[u8]>,
+{
+    fn eq(&self, other: &Self) -> bool {
+        **self == **other
+    }
+}
+
+impl<T> Eq for String<T> where T: AsRef<[u8]> {}
+
 impl<T> PartialEq<str> for String<T>
 where
     T: AsRef<[u8]>,
@@ -151,7 +162,24 @@ where
     }
 }
 
-#[allow(clippy::derive_hash_xor_eq)]
+impl<T> PartialOrd for String<T>
+where
+    T: AsRef<[u8]>,
+{
+    fn partial_cmp(&self, other: &Self) -> Option<cmp::Ordering> {
+        (**self).partial_cmp(&**other)
+    }
+}
+
+impl<T> Ord for String<T>
+where
+    T: AsRef<[u8]>,
+{
+    fn cmp(&self, other: &Self) -> cmp::Ordering {
+        (**self).cmp(&**other)
+    }
+}
+
 impl<T> hash::Hash for String<T>
 where
     T: AsRef<[u8]>,
